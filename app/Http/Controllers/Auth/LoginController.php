@@ -31,6 +31,22 @@ class LoginController extends Controller
     protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function apiLogout(Request $request)
+    {
+        if (auth('api')->user()) {
+            $user = auth('api')->user();
+            $user->api_token = null;
+            $user->save();
+        }
+        return ['logout' => true];
+    }
+
+    /**
      * Handle a login request to the application.
      *
      * @param  \Illuminate\Http\Request  $request

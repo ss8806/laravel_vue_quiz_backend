@@ -43,5 +43,24 @@ class ApiAuthTest extends TestCase
             ->assertJsonStructure([
                 'token',
             ]);
+        //Laravelのサーバー上での認証情報をログアウトして解除
+        \Auth::logout();
+        // ログイン後に返却されたtokenを取得し、リクエストヘッダーにtokenを設定して、URL「'/api/logout'」にPOSTしてレスポンスを取得
+        $token = $response->decodeResponseJson()['token'];
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'Accept' => 'application/json',
+        ])->json('POST', '/api/logout');
+        // レスポンスのステータスコードが200であることを確認し、返却されたJSONに「logout」が含まれていることを確認
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'logout',
+            ]);
+        // データベースのログアウトしたemailを持つユーザーのapi_tokenがnullであることを確認
+        $this->assertDatabaseHas('users', [
+            'email' => 'testUser@example.com',
+            'api_token' => null
+        ]);
     }
 }
