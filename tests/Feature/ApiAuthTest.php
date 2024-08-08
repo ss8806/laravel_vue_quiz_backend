@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
+use Illuminate\Support\Str;
 
 class ApiAuthTest extends TestCase
 {
@@ -62,5 +63,23 @@ class ApiAuthTest extends TestCase
             'email' => 'testUser@example.com',
             'api_token' => null
         ]);
+    }
+
+    /**
+     * A basic feature test example.
+     *
+     * @return void
+     */
+    public function test_auth_user()
+    {
+        $token = Str::random(80);
+
+        $user = factory(\App\User::class)->create([
+            'api_token' => hash('sha256', $token),
+        ]);
+
+        $response = $this->json('GET', "/api/user?api_token={$token}");
+
+        $this->assertEquals($user->toArray(), $response->decodeResponseJson());
     }
 }
