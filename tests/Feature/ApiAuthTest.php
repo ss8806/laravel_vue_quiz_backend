@@ -82,4 +82,32 @@ class ApiAuthTest extends TestCase
 
         $this->assertEquals($user->toArray(), $response->decodeResponseJson());
     }
+
+    /**
+     * A basic feature test example.
+     *
+     * @return void
+     */
+    public function test_auth_ranking()
+    {
+        $token = Str::random(80);
+
+        $user = factory(\App\User::class)->create([
+            'api_token' => hash('sha256', $token),
+        ]);
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $token,
+            'Accept' => 'application/json',
+        ])->json('POST', '/api/ranking', [
+            'correctRatio' => 5,
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('rankings', [
+            'percentage_correct_answer' => (string) 50,
+            'user_id' => (string) $user->id,
+        ]);
+    }
 }

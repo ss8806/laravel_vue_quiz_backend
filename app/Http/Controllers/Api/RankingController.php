@@ -3,12 +3,22 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Ranking;
 use DB;
+use Illuminate\Http\Request;
 
 class RankingController extends Controller
 {
+    protected $ranking;
+    /**
+     *
+     *
+     * @return void
+     */
+    public function __construct(Ranking $ranking)
+    {
+        $this->ranking = $ranking;
+    }
 
     /**
      *
@@ -27,7 +37,7 @@ class RankingController extends Controller
 
         $weekRankingData = [
             'percentage_correct_answer' => $weekRanking->pluck('percentage_correct_answer')->all(),
-            'name' => $weekRanking->pluck('user.name')->all()
+            'name' => $weekRanking->pluck('user.name')->all(),
         ];
 
         $monthRanking = Ranking::with('user')
@@ -40,7 +50,7 @@ class RankingController extends Controller
 
         $monthRankingData = [
             'percentage_correct_answer' => $monthRanking->pluck('percentage_correct_answer')->all(),
-            'name' => $monthRanking->pluck('user.name')->all()
+            'name' => $monthRanking->pluck('user.name')->all(),
         ];
 
         $totalRanking = Ranking::with('user')
@@ -52,10 +62,23 @@ class RankingController extends Controller
 
         $totalRankingData = [
             'percentage_correct_answer' => $totalRanking->pluck('percentage_correct_answer')->all(),
-            'name' => $totalRanking->pluck('user.name')->all()
+            'name' => $totalRanking->pluck('user.name')->all(),
         ];
 
-
         return ['weekRankingData' => $weekRankingData, 'monthRankingData' => $monthRankingData, 'totalRankingData' => $totalRankingData];
+    }
+
+    /**
+     *
+     * クイズ終了ボタンクリック時アクション
+     * @return
+     */
+    public function insertRanking(Request $request)
+    {
+        if (auth('api')->user()) {
+            // ユーザーがログイン中であればスコアをInsert
+            $correctRatio = $request->input('correctRatio');
+            $this->ranking->insertScore((int) $correctRatio * 10, auth('api')->user()->id);
+        }
     }
 }
