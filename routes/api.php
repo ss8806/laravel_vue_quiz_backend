@@ -27,3 +27,4 @@ Route::post('register', 'Auth\RegisterController@apiRegister');
 Route::post('login', 'Auth\LoginController@apiLogin');
 Route::post('logout', 'Auth\LoginController@apiLogout');
 Route::post('ranking', 'Api\RankingController@insertRanking');
+Route::middleware('auth:api')->get('/mypage', 'Api\MypageController@index');
