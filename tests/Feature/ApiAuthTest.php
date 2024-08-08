@@ -33,5 +33,15 @@ class ApiAuthTest extends TestCase
             'name' => 'test',
             'email' => 'testUser@example.com',
         ]);
+
+        $response = $this->json('POST', '/api/login', [
+            'email' => 'testUser@example.com',
+            'password' => 'password111',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'token',
+            ]);
     }
 }

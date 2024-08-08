@@ -24,3 +24,4 @@ Route::get('quizzes', 'Api\QuizController@index');
 Route::get('keywords', 'Api\KeywordController@index');
 Route::get('ranking', 'Api\RankingController@index');
 Route::post('register', 'Auth\RegisterController@apiRegister');
+Route::post('login', 'Auth\LoginController@apiLogin');
